@@ -17,15 +17,22 @@ This is a command-line Minesweeper game implemented in Java, following SOLID pri
 ## Design Principles
 - **SOLID Principles**: Each class has a single responsibility, dependencies are injected for testability, and the code is open for extension but closed for modification.
 - **Clean Architecture**: The project is organized into service, model, and CLI layers for separation of concerns and maintainability.
-- **Design Patterns**: MVC pattern is used to separate user interface, business logic, and data. Service layer encapsulates game rules and logic.
-- **Testability**: All core logic is covered by unit tests, and CLI interaction is tested for input validation.
+- **Design Patterns Used**:
+  - **MVC (Model-View-Controller)**: The overall architecture separates concerns:
+    - **Model**: `Board`, `Cell` classes represent the game state and data.
+    - **View**: `Cli` class handles user interaction and display.
+    - **Controller**: `GameService` class manages game logic and coordinates between model and view.
+  - **Service Layer Pattern**: `GameService` encapsulates business logic, win/loss detection, and game rules, providing a clean API for the CLI.
+  - **Factory Pattern**: The `Board` class acts as a factory for creating the grid and placing mines, abstracting the initialization logic.
+  - **Dependency Injection**: Constructors in `GameService`, `Board`, and `Cli` accept dependencies, making the code flexible and testable.
+  - **Strategy Pattern (implicit)**: The mine placement logic in `Board` can be extended to support different strategies for mine distribution.
 
 ## Design Explanation
-- **MinesweeperMain.java**: Entry point, initializes Cli and GameService.
-- **Cli.java**: Handles user input/output, prompts, and game loop. Follows the exact input/output format from the problem statement.
-- **GameService.java**: Manages game state, win/loss logic, and user moves.
-- **Board.java**: Represents the grid, mine placement, and uncovering logic.
-- **Cell.java**: Represents each cell (mine, uncovered, flagged, etc.).
+- **MinesweeperMain.java**: Entry point. Uses the Factory pattern to instantiate the CLI and GameService. Follows Dependency Injection by passing dependencies to constructors.
+- **Cli.java**: Implements the View in MVC. Handles all user input/output, prompts, and game loop. Uses Dependency Injection to receive the GameService instance. Follows the Observer pattern by updating the display after each move.
+- **GameService.java**: Implements the Controller in MVC and the Service Layer pattern. Manages game state, win/loss logic, and user moves. Coordinates between the CLI and Board. Uses Dependency Injection for testability.
+- **Board.java**: Implements the Model in MVC and the Factory pattern. Responsible for grid creation, mine placement, and uncovering logic. Can be extended for different mine placement strategies (Strategy pattern).
+- **Cell.java**: Implements the Model in MVC. Represents each cell's state (mine, uncovered, flagged, etc.).
 - **Tests**: Board, Cell, and GameService logic are unit tested for correctness. CLITest simulates user interaction and validates CLI output.
 
 ## Project Structure
@@ -103,6 +110,54 @@ Then build your image as usual:
 ```
 docker build -t minesweeper-game .
 ```
+
+## How to Run the Application
+
+### Prerequisites
+- Ensure you have Java 17 or higher installed.
+- Ensure you have Maven installed (for local build/test).
+- For Docker, ensure Docker Desktop (macOS/Windows) or Docker Engine (Linux) is installed and running.
+
+### Running Locally (Without Docker)
+1. **Build the project:**
+   ```sh
+   mvn clean package
+   ```
+2. **Run the application:**
+   ```sh
+   java -cp target/MinesweeperGame-1.0-SNAPSHOT.jar com.minesweepergame.MinesweeperMain
+   ```
+
+### Running with Docker
+1. **Build the Docker image:**
+   ```sh
+   docker build -t minesweeper-game .
+   ```
+2. **Run the application in a container:**
+   ```sh
+   docker run -it minesweeper-game
+   ```
+   The CLI will start and you can interact with the game in your terminal.
+
+### Running Tests and Viewing Code Coverage
+1. **Run all tests and generate code coverage report:**
+   ```sh
+   mvn clean test verify
+   ```
+2. **View the coverage report:**
+   Open `target/site/jacoco/index.html` in your browser for a detailed report.
+
+### Common Issues
+- **Docker Daemon Not Running:**
+  If you see `ERROR: Cannot connect to the Docker daemon...`, start Docker Desktop (macOS/Windows) or the Docker service (Linux).
+- **Legacy Builder Warning:**
+  If you see `DEPRECATED: The legacy builder is deprecated...`, you can safely ignore it or enable BuildKit:
+  ```sh
+  export DOCKER_BUILDKIT=1
+  docker build -t minesweeper-game .
+  ```
+- **Starting Docker on macOS:**
+  Download Docker Desktop from [docker.com](https://www.docker.com/products/docker-desktop/), install, and start from Applications or Launchpad. Wait for the whale icon in the menu bar before running Docker commands.
 
 ## Gameplay Example
 ### Success Example
