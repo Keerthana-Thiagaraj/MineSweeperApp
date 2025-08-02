@@ -87,6 +87,23 @@ This HTML file shows detailed code coverage for your project.
 
 This will start the Minesweeper CLI in a container. You can interact with the game in your terminal.
 
+## Docker Build Warning
+If you see the message:
+
+```
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+```
+
+This is a warning from Docker and does not affect your application. You can safely ignore it. For a modern build experience, you can enable BuildKit:
+
+```
+export DOCKER_BUILDKIT=1
+```
+Then build your image as usual:
+```
+docker build -t minesweeper-game .
+```
+
 ## Gameplay Example
 ### Success Example
 ```
